@@ -1,13 +1,13 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 
 # -------- LOAD DATA --------
 df = pd.read_csv("Transformed_TouristDestinations.csv")
-origin_col = "Home Address: Region"
-repeat_col = "Have you visited this tourist destination before?"
-dest_cols = [c for c in df.columns if "tourist destination do you prefer" in c.lower()]
 
-# -------- RELATIVE LOCATION FUNCTION --------
+# -------- RELATIVE LOCATION (origin, destination, repeat visitatin)--------
+origin_col = "home_address:_region"
+repeat_col = "have_you_visited_this_tourist_destination_before"
+dest_cols = [c for c in df.columns if "tourist_destination_do_you_prefer" in c.lower()]
+
 def rel_loc(freq):
     """Compute frequency table, quartiles, deciles, and selected percentiles."""
     freq = freq.sort_values(ascending=False)
@@ -31,24 +31,23 @@ origin_table, origin_q, origin_d, origin_p = rel_loc(df[origin_col].value_counts
 repeat_table, repeat_q, repeat_d, repeat_p = rel_loc(df[repeat_col].value_counts())
 
 dest_freq = df[dest_cols].sum()
-dest_freq.index = dest_freq.index.str.split("_", n=1).str[-1]  # clean names
+dest_freq.index = dest_freq.index.str.replace("what_specific_phillippine_tourist_destination_do_you_prefer_", "", regex=False).str.replace("_", " ").str.title()
 dest_table, dest_q, dest_d, dest_p = rel_loc(dest_freq)
 
-# -------- FUNCTION TO PLOT TABLE + QUARTILES AS IMAGE --------
-def plot_summary(title, table, quartiles):
-    fig, ax = plt.subplots(figsize=(12, len(table)*0.25 + 2))
-    ax.axis('off')
-    
-    text = f"--- {title} ---\n\n{table.to_string()}\n\n" \
-           f"25% : {quartiles['Q1_cat']}\n" \
-           f"50% (Median) : {quartiles['Q2_cat']}\n" \
-           f"75% : {quartiles['Q3_cat']}"
-    
-    ax.text(0, 1, text, va='top', family='monospace', fontsize=10)
-    plt.tight_layout()
-    plt.show()
+print("\n--- ORIGIN ---")
+print(origin_table)
+print(f"\n25% of respondents are from: {origin_q['Q1_cat']}")
+print(f"50% (Median) are from:       {origin_q['Q2_cat']}")
+print(f"75% of respondents are from: {origin_q['Q3_cat']}")
 
-# -------- PLOT RESULTS --------
-plot_summary("ORIGIN", origin_table, origin_q)
-plot_summary("REPEAT VISIT", repeat_table, repeat_q)
-plot_summary("DESTINATIONS", dest_table, dest_q)
+print("\n--- REPEAT VISIT ---")
+print(repeat_table)
+print(f"\n25% of respondents: {repeat_q['Q1_cat']}")
+print(f"50% (Median):       {repeat_q['Q2_cat']}")
+print(f"75% of respondents: {repeat_q['Q3_cat']}")
+
+print("\n--- DESTINATIONS ---")
+print(dest_table)
+print(f"\n25% of preferences: {dest_q['Q1_cat']}")
+print(f"50% (Median):       {dest_q['Q2_cat']}")
+print(f"75% of preferences: {dest_q['Q3_cat']}")
