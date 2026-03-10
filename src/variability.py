@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 df = pd.read_csv('Transformed_TouristDestinations.csv')
 
 # ----- Variability (most important elements of the trip) -----
-cols = [c for c in df.columns if "What factors are most important when planning your trip?" in c]
+cols = [c for c in df.columns if "what_factors_are_most_important_when_planning_your_trip" in c.lower()]
 f_df = df[cols]
 
 # Calculate statistics directly into the DataFrame
 stats_df = pd.DataFrame({
-    'Factor': [c.split('_')[-1] for c in cols],
+    'Factor': [c.split('options._')[-1].replace('_', ' ').title() for c in cols],
     'Count (Yes)': f_df.sum().values,
     'Count (No)': len(df) - f_df.sum().values,
     'Proportion (Mean)': f_df.mean().values,
